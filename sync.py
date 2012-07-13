@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 def get_json( filename='' ):
     output = ''
@@ -42,7 +43,6 @@ def copy( origin='', destiny='' ):
         return output
 
 def files( sync_format='', main_directory='', action_directory='' ):
-    import pdb; pdb.set_trace()
     output = False
 
     try:

@@ -6,7 +6,6 @@ def main():
     Sync files, a CLI tools to copy files using a json file in the focused directory.
     '''
     import sys, sync
-    import pdb; pdb.set_trace()
     
     # Arguments
     args = sys.argv
@@ -36,8 +35,18 @@ def main():
             parameters.has_key( parameters_name[1] ) and \
             parameters.has_key( parameters_name[2] ) 
         ):
-            # Sync files 
-            sync.files( parameters[ parameters_name[0] ], parameters[ parameters_name[1] ], parameters[ parameters_name[2] ] )
+            # Sync files
+            path_to_update_file = '{0}/{1}'.format( parameters[ parameters_name[1] ], parameters[ parameters_name[0] ] )
+
+            sync.files( 
+                sync.get_json( 
+                    path_to_update_file
+                ), 
+                
+                parameters[ parameters_name[1] ], 
+                parameters[ parameters_name[2] ] 
+            )
+
             print 'Sync complete look at the log file!'
         else:
             print 'Parameters incorrect!'
