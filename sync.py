@@ -46,37 +46,62 @@ def files( sync_format='', main_directory='', action_directory='' ):
     output = False
 
     try:
-        import os
+        import os, json
         
         if sync_format and os.path.exists( main_directory ) and os.path.exists( '%s/%s' % ( main_directory, action_directory ) ):
             # Go to directory working directory
             os.chdir( main_directory ) 
             
             if action_directory in os.listdir('./'):
+                log_file = open( '{0}/logs.json'.format( main_directory ), 'w' )
+                logs = []
+                files_success = 0
+                
                 for reference in sync_format:
                     paths = reference['link'].split('/')[3:]
+                    origin_path = ''
                     destiny_path = ''
+
     
                     for path in paths:
-                        destiny_path += path
+                        destiny_path += '/{0}'.format( path )
+                        current_directory = os.listdir('./')
+                        the_file = paths[-1:][0] == path
+                        file_copy_success = False
 
-                        if path in os.listdir('./'):
-                            os.chdir( path )
-                        if not path in os.listdir('./') and not paths[-1:] == path:
-                            os.mkdir( './%s' % ( path ) )
-                        if paths[-1:] == path and not os.exists( './%s' % ( path ) ):
-                            output = copy( 
-                                ( '%s/%s/%s' % ( main_directory, action_directory, path ) ),
-                                ( destiny_path )
+                        if the_file:
+                            origin_path = '{0}/{1}/{2}'.format( main_directory, action_directory, path )
+                            destiny_path = '{0}{1}'.format( main_directory, destiny_path )
+
+                            # Copy file to respectivity path
+                            file_copy_success = copy(
+                                origin_path,
+                                destiny_path
                             )
-
                             
-                output = sync_format
+                            if file_copy_success and os.path.exists( destiny_path ):
+                                files_success += 1
+                                os.chdir( main_directory )
+                                # Add to logs list the status of the file
+                                logs.append( { 'link': reference, 'status': 'copied', 'exists': os.path.exists( destiny_path ) } )
+                            else:
+                                os.chdir( main_directory )
+                                logs.append( { 'link': reference, 'status': 'not copied', 'exists': os.path.exists( destiny_path ) } )
+                        if path in current_directory and not the_file:
+                            os.chdir( path )
+                        if not path in current_directory and not os.path.exists( './{0}'.format( path ) ) and not the_file:
+                            os.mkdir( path )
+                            os.chdir( path )
+                if files_success == len( sync_format ):
+                    output = True
+                
+                # Log the behavior
+                log_file.write( json.dumps( logs ) )
+                log_file.close()
         return output
     except Exception:
         return output
 
-if __name__ == '__main__':
-    default_path = '/Users/kaiquesilva/Dropbox/PhoenixProjects/PDFs'
-    print files( get_json( '%s/gordo/update.json' % ( default_path ) ), default_path, 'gordo')
-    # print get_json('/Users/kaiquesilva/Dropbox/PhoenixProjects/PDFs/gordo/update.json')
+# default_path = '/Users/kaiquesilva/Dropbox/PhoenixProjects/PDFs'
+# print files( get_json( '%s/gordo/update.json' % ( default_path ) ), default_path, 'gordo')
+# print get_json('/Users/kaiquesilva/Dropbox/PhoenixProjects/PDFs/gordo/update.json')
