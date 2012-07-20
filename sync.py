@@ -16,8 +16,6 @@ def get_json( filename='' ):
                 .replace( ' ', '' )
                 # Remove line-breakers
                 .replace( '\n', '' )
-                # Change ' to "
-                .replace( '\'', '\"' )
             )
 
             output = format_file
@@ -48,7 +46,7 @@ def files( sync_format='', main_directory='', action_directory='' ):
     try:
         import os, json
         
-        if sync_format and os.path.exists( main_directory ) and os.path.exists( '%s/%s' % ( main_directory, action_directory ) ):
+        if os.path.exists( main_directory ) and os.path.exists( '%s/%s' % ( main_directory, action_directory ) ) and sync_format:
             # Go to directory working directory
             os.chdir( main_directory ) 
             
@@ -83,10 +81,10 @@ def files( sync_format='', main_directory='', action_directory='' ):
                                 files_success += 1
                                 os.chdir( main_directory )
                                 # Add to logs list the status of the file
-                                logs.append( { 'link': reference, 'status': 'copied', 'exists': os.path.exists( destiny_path ) } )
+                                logs.append( { 'link': reference['link'], 'status': 'copied', 'exists': os.path.exists( destiny_path ) } )
                             else:
                                 os.chdir( main_directory )
-                                logs.append( { 'link': reference, 'status': 'not copied', 'exists': os.path.exists( destiny_path ) } )
+                                logs.append( { 'link': reference['link'], 'status': 'not copied', 'exists': os.path.exists( destiny_path ) } )
                         if path in current_directory and not the_file:
                             os.chdir( path )
                         if not path in current_directory and not os.path.exists( './{0}'.format( path ) ) and not the_file:

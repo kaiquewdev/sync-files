@@ -36,9 +36,9 @@ def main():
             parameters.has_key( parameters_name[2] ) 
         ):
             # Sync files
-            path_to_update_file = '{0}/{1}'.format( parameters[ parameters_name[1] ], parameters[ parameters_name[0] ] )
+            path_to_update_file = '{0}/{1}/{2}'.format( parameters[ parameters_name[1] ], parameters[ parameters_name[2] ] , parameters[ parameters_name[0] ] )
 
-            sync.files( 
+            sync_output = sync.files( 
                 sync.get_json( 
                     path_to_update_file
                 ), 
@@ -47,7 +47,10 @@ def main():
                 parameters[ parameters_name[2] ] 
             )
 
-            print 'Sync complete look at the log file!'
+            if sync_output:
+                print 'Sync complete look at the log file!'
+            else:
+                print 'Sync failed, sorry.'
         else:
             print 'Parameters incorrect!'
     else:
